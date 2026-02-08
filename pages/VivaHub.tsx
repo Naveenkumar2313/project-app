@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generateProjectAbstract, generateVivaQuestions } from '../services/geminiService';
+import { generateProjectSynopsis, generateVivaQuestions } from '../services/geminiService';
 import { Bot, FileText, Loader2, BookOpen, AlertCircle } from 'lucide-react';
 import { PROJECTS } from '../services/mockData';
 
@@ -7,7 +7,7 @@ const VivaHub = () => {
   const [selectedProjectId, setSelectedProjectId] = useState(PROJECTS[0].id);
   const [loading, setLoading] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'abstract' | 'questions'>('abstract');
+  const [activeTab, setActiveTab] = useState<'synopsis' | 'questions'>('synopsis');
 
   const selectedProject = PROJECTS.find(p => p.id === selectedProjectId);
 
@@ -18,8 +18,8 @@ const VivaHub = () => {
     setGeneratedContent('');
     
     let result = '';
-    if (activeTab === 'abstract') {
-      result = await generateProjectAbstract(selectedProject.title, selectedProject.department);
+    if (activeTab === 'synopsis') {
+      result = await generateProjectSynopsis(selectedProject.title, selectedProject.department);
     } else {
       result = await generateVivaQuestions(selectedProject.title);
     }
@@ -55,10 +55,10 @@ const VivaHub = () => {
           
           <div className="flex space-x-2 bg-white p-1 rounded-lg border border-slate-200">
              <button 
-               onClick={() => { setActiveTab('abstract'); setGeneratedContent(''); }}
-               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'abstract' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+               onClick={() => { setActiveTab('synopsis'); setGeneratedContent(''); }}
+               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'synopsis' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
              >
-               Generate Abstract
+               Generate Synopsis
              </button>
              <button 
                 onClick={() => { setActiveTab('questions'); setGeneratedContent(''); }}
@@ -73,8 +73,8 @@ const VivaHub = () => {
           {generatedContent ? (
             <div className="prose prose-slate max-w-none">
               <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center">
-                {activeTab === 'abstract' ? <FileText className="w-5 h-5 mr-2" /> : <BookOpen className="w-5 h-5 mr-2" />}
-                {activeTab === 'abstract' ? 'Generated Academic Abstract' : 'Predicted Viva Questions'}
+                {activeTab === 'synopsis' ? <FileText className="w-5 h-5 mr-2" /> : <BookOpen className="w-5 h-5 mr-2" />}
+                {activeTab === 'synopsis' ? 'Generated Project Synopsis' : 'Predicted Viva Questions'}
               </h3>
               <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 whitespace-pre-wrap text-slate-700 leading-relaxed font-serif">
                 {generatedContent}
@@ -102,8 +102,8 @@ const VivaHub = () => {
                    </div>
                    <h3 className="text-lg font-medium text-slate-900 mb-2">Ready to assist</h3>
                    <p className="text-slate-500 mb-6">
-                     {activeTab === 'abstract' 
-                        ? 'I can write a professional abstract for your report based on the project title and department standards.' 
+                     {activeTab === 'synopsis' 
+                        ? 'I can write a structured 3-section synopsis (Intro, Proposed System, Conclusion) for your report.' 
                         : 'I can predict technical questions external examiners might ask about this specific project.'}
                    </p>
                    {!process.env.API_KEY && (
@@ -116,7 +116,7 @@ const VivaHub = () => {
                       onClick={handleGenerate}
                       className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
                    >
-                     Generate {activeTab === 'abstract' ? 'Abstract' : 'Questions'}
+                     Generate {activeTab === 'synopsis' ? 'Synopsis' : 'Questions'}
                    </button>
                  </div>
                )}

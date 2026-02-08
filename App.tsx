@@ -5,19 +5,22 @@ import Gallery from './pages/Gallery';
 import ProjectDetail from './pages/ProjectDetail';
 import Dashboard from './pages/Dashboard';
 import VivaHub from './pages/VivaHub';
+import { CartProvider } from './contexts/CartContext';
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Gallery />} />
-          <Route path="/project/:id" element={<ProjectDetail />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/viva" element={<VivaHub />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <CartProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Gallery />} />
+            <Route path="/project/:id" element={<ProjectDetail />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/viva" element={<VivaHub />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </CartProvider>
   );
 };
 

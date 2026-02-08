@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {  Cpu, BookOpen, LayoutDashboard, ShoppingCart, Menu, X } from 'lucide-react';
+import { useCart } from '../contexts/CartContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const location = useLocation();
+  const { items } = useCart();
 
   const navLinks = [
     { name: 'Projects', path: '/', icon: <Cpu className="w-4 h-4 mr-2" /> },
@@ -22,11 +24,23 @@ const Navbar = () => {
             <div className="flex-shrink-0 flex items-center">
               <Link to="/" className="flex items-center">
                 <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-md flex items-center justify-center text-white font-bold text-lg mr-2">
-                  T
+                  P
                 </div>
-                <span className="font-bold text-xl text-slate-900 tracking-tight">Techno<span className="text-orange-600">Scholars</span></span>
+                <div className="flex flex-col justify-center">
+                  <span className="font-bold text-lg text-slate-900 tracking-tight leading-none">Pygenicarc<span className="text-orange-600">Tech</span></span>
+                  <span className="text-[0.65rem] text-slate-500 font-medium tracking-wide uppercase">Innovating India</span>
+                </div>
               </Link>
             </div>
+            
+            {/* Make in India Badge */}
+            <div className="hidden lg:flex items-center ml-4 px-2 py-1 bg-orange-50 border border-orange-100 rounded-full">
+              <span className="text-[10px] font-bold text-orange-700 flex items-center">
+                <span className="w-2 h-2 bg-orange-500 rounded-full mr-1.5 animate-pulse"></span>
+                Make in India Initiative 🇮🇳
+              </span>
+            </div>
+
             <div className="hidden sm:ml-8 sm:flex sm:space-x-8">
               {navLinks.map((link) => (
                 <Link
@@ -43,7 +57,7 @@ const Navbar = () => {
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             <button className="bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-800 transition-colors flex items-center">
               <ShoppingCart className="w-4 h-4 mr-2" />
-              Cart (0)
+              Cart ({items.length})
             </button>
           </div>
           <div className="-mr-2 flex items-center sm:hidden">
@@ -93,9 +107,15 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       </main>
       <footer className="bg-white border-t border-slate-200 mt-auto">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-slate-500">
-            © 2024 TechnoScholars. Built for Engineering Excellence. Made in India 🇮🇳
-          </p>
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <p className="text-center text-sm text-slate-500 mb-2 md:mb-0">
+              © 2024 Pygenicarc Technologies. Empowering Future Engineers.
+            </p>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-semibold text-slate-400">Proudly</span>
+              <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded border border-orange-100">Made in India 🇮🇳</span>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

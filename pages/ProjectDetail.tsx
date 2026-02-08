@@ -2,14 +2,22 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PackageType } from '../types';
 import { PROJECTS } from '../services/mockData';
-import { Check, ShieldCheck, Download, Truck, Cpu, FileText, UploadCloud } from 'lucide-react';
+import { useCart } from '../contexts/CartContext';
+import { Check, ShieldCheck, Download, Truck, Cpu, FileText, UploadCloud, Loader2 } from 'lucide-react';
 
 const ProjectDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const project = PROJECTS.find(p => p.id === id);
   const [selectedPkg, setSelectedPkg] = useState<PackageType>(PackageType.DIGITAL);
+  
+  // Custom Request State
   const [showCustomForm, setShowCustomForm] = useState(false);
+  const [customRequestText, setCustomRequestText] = useState('');
+  const [customFile, setCustomFile] = useState<File | null>(null);
+  const [isSubmittingCustom, setIsSubmittingCustom] = useState(false);
+  const [customSubmitSuccess, setCustomSubmitSuccess] = useState(false);
 
   if (!project) return <div>Project not found</div>;
 
@@ -28,8 +36,51 @@ const ProjectDetail = () => {
   };
 
   const handleBooking = () => {
-    alert(`Booked ${project.title} - ${selectedPkg}`);
-    navigate('/dashboard');
+    addToCart({
+      projectId: project.id,
+      title: project.title,
+      packageType: selectedPkg,
+      price: getPrice(),
+      imageUrl: project.imageUrl
+    });
+    // Visual feedback handled by cart counter update, but let's show a simple browser alert or better, just rely on the UI update for now as user didn't specify toast
+    alert("Added to Cart!");
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCustomFile(e.target.files[0]);
+    }
+  };
+
+  const handleCustomSubmit = async () => {
+    if (!customRequestText) {
+      alert("Please describe your requirement.");
+      return;
+    }
+
+    setIsSubmittingCustom(true);
+
+    // Mock API Call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // "Save" to local state logic (simulated)
+    console.log("Custom Request Saved:", {
+      projectId: project.id,
+      requirement: customRequestText,
+      fileName: customFile?.name || 'No file'
+    });
+
+    setIsSubmittingCustom(false);
+    setCustomSubmitSuccess(true);
+    
+    // Reset after delay
+    setTimeout(() => {
+      setShowCustomForm(false);
+      setCustomSubmitSuccess(false);
+      setCustomRequestText('');
+      setCustomFile(null);
+    }, 2000);
   };
 
   return (
@@ -79,20 +130,56 @@ const ProjectDetail = () => {
            </div>
            
            {showCustomForm && (
-             <form className="space-y-4 animate-fadeIn">
-               <div>
-                 <label className="block text-sm font-medium text-slate-700 mb-1">Problem Statement / Requirement</label>
-                 <textarea className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500" rows={4} placeholder="Describe the changes or new project idea..."></textarea>
-               </div>
-               <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Upload Reference File (PDF/Doc)</label>
-                  <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer">
-                    <UploadCloud className="w-8 h-8 text-slate-400 mb-2" />
-                    <span className="text-xs text-slate-500">Click to upload or drag and drop</span>
+             <div className="animate-fadeIn">
+                {customSubmitSuccess ? (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center text-green-700">
+                    <Check className="w-8 h-8 mx-auto mb-2" />
+                    <p className="font-semibold">Request Received!</p>
+                    <p className="text-sm">Our engineering team will review your requirements and contact you shortly.</p>
                   </div>
-               </div>
-               <button type="button" className="w-full bg-slate-900 text-white py-2 rounded-lg text-sm font-medium hover:bg-slate-800">Submit Request</button>
-             </form>
+                ) : (
+                  <form className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Problem Statement / Requirement</label>
+                      <textarea 
+                        className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500" 
+                        rows={4} 
+                        placeholder="Describe the changes or new project idea..."
+                        value={customRequestText}
+                        onChange={(e) => setCustomRequestText(e.target.value)}
+                      ></textarea>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Upload Reference File (PDF/Doc)</label>
+                        <div className="relative border-2 border-dashed border-slate-300 rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors cursor-pointer group">
+                          <input 
+                            type="file" 
+                            onChange={handleFileChange} 
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                            accept=".pdf,.doc,.docx"
+                          />
+                          <UploadCloud className="w-8 h-8 text-slate-400 mb-2 group-hover:text-orange-500 transition-colors" />
+                          <span className="text-xs text-slate-500">
+                            {customFile ? customFile.name : 'Click to upload or drag and drop'}
+                          </span>
+                        </div>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={handleCustomSubmit}
+                      disabled={isSubmittingCustom}
+                      className="w-full bg-slate-900 text-white py-2 rounded-lg text-sm font-medium hover:bg-slate-800 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                    >
+                      {isSubmittingCustom ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : 'Submit Request'}
+                    </button>
+                  </form>
+                )}
+             </div>
            )}
         </div>
       </div>
@@ -161,7 +248,7 @@ const ProjectDetail = () => {
               onClick={handleBooking}
               className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg shadow-md transition-colors flex justify-center items-center"
             >
-              Book Now
+              Add to Cart
             </button>
             <p className="text-xs text-center text-slate-400 mt-3">Secure payment via UPI / Card</p>
           </div>
