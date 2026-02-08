@@ -1,0 +1,23 @@
+
+{
+  "short_name": "Pygenicarc",
+  "name": "Pygenicarc Technologies",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192.png?text=Pygenicarc",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://via.placeholder.com/512.png?text=Pygenicarc",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#ea580c",
+  "orientation": "portrait"
+}

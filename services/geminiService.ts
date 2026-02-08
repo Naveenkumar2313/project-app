@@ -1,3 +1,4 @@
+
 import { GoogleGenAI } from "@google/genai";
 
 const apiKey = process.env.API_KEY || ''; // Ensure this is set in your environment
@@ -40,8 +41,8 @@ export const generateVivaQuestions = async (projectTitle: string): Promise<strin
   
   try {
     const prompt = `
-      Generate 5 likely Viva-Voce technical questions and brief answers for the engineering project: "${projectTitle}".
-      Format the output as a clean Markdown list.
+      Generate 10 likely Viva-Voce technical questions and brief answers for the engineering project: "${projectTitle}".
+      Format the output as a numbered list with bold Questions.
     `;
 
     const response = await ai.models.generateContent({
@@ -54,4 +55,60 @@ export const generateVivaQuestions = async (projectTitle: string): Promise<strin
     console.error("Gemini API Error:", error);
     return "An error occurred while generating questions.";
   }
+}
+
+export const generateSlideDeck = async (projectTitle: string): Promise<string> => {
+  if (!apiKey) return "API Key is missing.";
+  
+  try {
+    const prompt = `
+      Create a 10-slide presentation outline for the project "${projectTitle}".
+      For each slide, provide:
+      - **Slide Title**
+      - **Key Bullet Points** (3-4 points)
+      - **Speaker Notes** (Brief script for the presenter)
+      
+      Format as Markdown.
+    `;
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+    });
+    return response.text || "Failed to generate slides.";
+  } catch (error) { return "Error generating slides."; }
+}
+
+export const generateInterviewPrep = async (projectTitle: string): Promise<string> => {
+  if (!apiKey) return "API Key is missing.";
+  
+  try {
+    const prompt = `
+      Generate interview preparation questions for a student who built "${projectTitle}".
+      Include:
+      1. **5 Technical Deep-Dive Questions** (About algorithms, component choices, failure cases).
+      2. **5 HR/Behavioral Questions** (Challenges faced, teamwork, future scope).
+      Provide brief ideal answers for the technical questions.
+    `;
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+    });
+    return response.text || "Failed to generate interview prep.";
+  } catch (error) { return "Error generating interview prep."; }
+}
+
+export const generateCitations = async (projectTitle: string): Promise<string> => {
+  if (!apiKey) return "API Key is missing.";
+  
+  try {
+    const prompt = `
+      Generate a list of 5 academic references/citations relevant to the domain of "${projectTitle}" (e.g., IEEE papers, Books, or Standard Documentation).
+      Format them in IEEE Citation Style.
+    `;
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+    });
+    return response.text || "Failed to generate citations.";
+  } catch (error) { return "Error generating citations."; }
 }
