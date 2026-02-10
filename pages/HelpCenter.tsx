@@ -1,14 +1,19 @@
 
 import React, { useState } from 'react';
+import { useNotification } from '../contexts/NotificationContext';
+import { DataManager } from '../services/dataManager';
+import { SupportTicket, TicketPriority } from '../types';
 import { Search, ChevronRight, MessageSquare, Book, AlertCircle, CheckCircle, Send, FileQuestion } from 'lucide-react';
 import { HELP_ARTICLES } from '../services/mockData';
+import { ChatBot } from '../components/ChatBot';
 
 const HelpCenter = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  const { addToast } = useNotification();
   
   // Ticket Form State
-  const [ticketForm, setTicketForm] = useState({ subject: '', type: 'Technical', message: '' });
+  const [ticketForm, setTicketForm] = useState({ subject: '', type: 'Technical', message: '', priority: 'Medium' as TicketPriority });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -27,8 +32,24 @@ const HelpCenter = () => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    setSuccessMessage(`Ticket #${Math.floor(1000 + Math.random() * 9000)} Created Successfully! Notification sent to email & SMS.`);
-    setTicketForm({ subject: '', type: 'Technical', message: '' });
+    const newTicket: SupportTicket = {
+      id: `TKT-${Math.floor(1000 + Math.random() * 9000)}`,
+      subject: ticketForm.subject,
+      message: ticketForm.message,
+      status: 'Open',
+      priority: ticketForm.priority,
+      date: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+      type: ticketForm.type as any,
+      replies: []
+    };
+
+    DataManager.addTicket(newTicket);
+    
+    const msg = `Ticket #${newTicket.id} Created Successfully! Notification sent to email & SMS.`;
+    setSuccessMessage(msg);
+    addToast('success', 'Ticket Submitted Successfully!');
+    setTicketForm({ subject: '', type: 'Technical', message: '', priority: 'Medium' });
     setIsSubmitting(false);
 
     // Clear success message after 5 seconds
@@ -36,7 +57,7 @@ const HelpCenter = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-12">
+    <div className="max-w-5xl mx-auto space-y-12 pb-24 relative">
       {/* Hero Section */}
       <div className="text-center space-y-4 py-8">
         <h1 className="text-4xl font-bold text-slate-900">How can we help you?</h1>
@@ -148,6 +169,24 @@ const HelpCenter = () => {
                         <option value="General">General Inquiry</option>
                       </select>
                     </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Priority Level</label>
+                      <div className="flex gap-4">
+                        {['Low', 'Medium', 'High', 'Critical'].map((p) => (
+                          <label key={p} className="flex items-center cursor-pointer">
+                            <input 
+                              type="radio" 
+                              name="priority" 
+                              value={p} 
+                              checked={ticketForm.priority === p}
+                              onChange={(e) => setTicketForm({...ticketForm, priority: e.target.value as TicketPriority})}
+                              className="mr-2 text-orange-600 focus:ring-orange-500"
+                            />
+                            <span className={`text-sm font-medium ${p === 'Critical' ? 'text-red-600' : 'text-slate-700'}`}>{p}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
                  </div>
                  
                  <div>
@@ -164,7 +203,7 @@ const HelpCenter = () => {
 
                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-start text-sm text-blue-800">
                     <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
-                    <p>Response time is typically 24 hours. Critical technical issues are prioritized.</p>
+                    <p>Response time is based on priority level. Critical issues are addressed within 4 hours.</p>
                  </div>
 
                  <button 
@@ -178,6 +217,8 @@ const HelpCenter = () => {
             )}
          </div>
       </div>
+
+      <ChatBot />
     </div>
   );
 };

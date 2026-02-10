@@ -34,6 +34,93 @@
       .pb-safe {
         padding-bottom: env(safe-area-inset-bottom);
       }
+
+      /* --- Accessibility Improvements --- */
+      
+      /* Focus Indicator */
+      :focus-visible {
+        outline: 3px solid #f97316;
+        outline-offset: 2px;
+      }
+
+      /* Skip to Content Link */
+      .skip-link {
+        position: absolute;
+        top: -100px;
+        left: 10px;
+        background: #ea580c;
+        color: white;
+        padding: 12px 20px;
+        z-index: 9999;
+        font-weight: bold;
+        transition: top 0.2s;
+        border-radius: 0 0 8px 8px;
+      }
+      .skip-link:focus {
+        top: 0;
+      }
+
+      /* High Contrast Mode */
+      body.high-contrast {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+      }
+      
+      body.high-contrast * {
+        border-color: #ffffff !important;
+      }
+
+      body.high-contrast a {
+        color: #ffff00 !important;
+        text-decoration: underline !important;
+      }
+
+      body.high-contrast button, 
+      body.high-contrast .btn {
+        background-color: #000000 !important;
+        color: #ffff00 !important;
+        border: 2px solid #ffff00 !important;
+        font-weight: bold !important;
+      }
+
+      body.high-contrast input, 
+      body.high-contrast select, 
+      body.high-contrast textarea {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border: 2px solid #ffffff !important;
+      }
+
+      body.high-contrast .bg-white,
+      body.high-contrast .bg-slate-50,
+      body.high-contrast .bg-slate-100,
+      body.high-contrast .bg-slate-900,
+      body.high-contrast .bg-orange-50 {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+      }
+
+      body.high-contrast img {
+        filter: grayscale(100%) contrast(120%);
+      }
+
+      /* Animations */
+      @keyframes pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+      }
+      .animate-pop:active {
+        animation: pop 0.2s ease-in-out;
+      }
+
+      @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .animate-slideUp {
+        animation: slideUp 0.4s ease-out forwards;
+      }
     </style>
   <script type="importmap">
 {

@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { generateProjectSynopsis, generateVivaQuestions, generateSlideDeck, generateInterviewPrep, generateCitations } from '../services/geminiService';
+import { useNotification } from '../contexts/NotificationContext';
 import { Bot, FileText, Loader2, BookOpen, AlertCircle, Mic, Square, Play, Download, Presentation, Users, Quote, Clock, X, ChevronRight, ChevronLeft, Printer } from 'lucide-react';
 import { PROJECTS } from '../services/mockData';
 
@@ -9,6 +10,7 @@ const VivaHub = () => {
   const [loading, setLoading] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'synopsis' | 'questions' | 'slides' | 'interview' | 'citations'>('synopsis');
+  const { addToast } = useNotification();
 
   // Practice Mode State
   const [isPracticeMode, setIsPracticeMode] = useState(false);
@@ -66,7 +68,7 @@ const VivaHub = () => {
       mediaRecorder.start();
       setIsRecording(true);
     } catch (err) {
-      alert("Microphone access denied or not available.");
+      addToast('error', "Microphone access denied or not available.");
     }
   };
 
